@@ -1,0 +1,15 @@
+[uBlock Origin]
+
+! https://www.hltv.org
+www.hltv.org###betting
+www.hltv.org##.allstargg-container
+www.hltv.org##.allstargg-iframe
+www.hltv.org##.streams-section
+www.hltv.org##.yabo-firstcol-box
+www.hltv.org##.matchpage-after-betting-web
+
+! https://www.bilibili.com
+www.bilibili.com##.adblock-tips
+
+! https://www.zhihu.com
+www.zhihu.com##.css-173vipd.Card
