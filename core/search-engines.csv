@@ -1,0 +1,41 @@
+name,keyword,url
+"必应",bing.com,{bing:cnBaseURL}search?q={searchTerms}&{bing:cvid}{bing:msb}{google:assistedQueryStats}
+Google,@google,{google:baseURL}search?q={searchTerms}&{google:RLZ}{google:originalQueryForSuggestion}{google:assistedQueryStats}{google:searchboxStats}{google:searchFieldtrialParameter}{google:language}{google:prefetchSource}{google:searchClient}{google:sourceId}{google:searchSource}{google:contextualSearchVersion...
+DuckDuckGo,@duck,https://duckduckgo.com/?q={searchTerms}&ia=web
+"收藏夹","@最喜欢",edge://favorites/?q={searchTerms}
+"历史记录","@历史记录",edge://history/all?q={searchTerms}
+"标签页","@标签页",edge://history/syncedTabs?q={searchTerms}
+GitHub,@github,https://github.com/search?q={searchTerms}&type=repositories
+SteamDB,@steamdb,https://steamdb.info/search/?q={searchTerms}
+Scoop,@scoop,https://scoop.sh/#/apps?q={searchTerms}
+"PS Gallery",@powershell,https://www.powershellgallery.com/packages?q={searchTerms}
+Wiki,@wiki,https://zh.wikipedia.org/w/index.php?title=Special:Search&search={searchTerms}
+Copilot,@copilot,https://copilot.microsoft.com/?q={searchTerms}&form=EDGAAC
+"SO Search",@stackoverflow,https://stackoverflow.com/search?q={searchTerms}
+MSYS,@msys,https://packages.msys2.org/search?q={searchTerms}
+Conda,@conda,https://anaconda.org/search?q={searchTerms}
+PyPI,@pypi,https://pypi.org/search/?q={searchTerms}
+npm,@npm,https://www.npmjs.com/search?q={searchTerms}
+vcpkg,@vcpkg,https://vcpkg.io/en/packages?query={searchTerms}
+GTrans,@trans,https://translate.google.com/?source=osdd&sl=auto&tl=auto&text={searchTerms}&op=translate
+"豆瓣",@douban,https://www.douban.com/search?q={searchTerms}
+"豆瓣读书",book.douban.com,https://search.douban.com/book/subject_search?cat=1001&search_text={searchTerms}
+itch,@itch,https://itch.io/search?q={searchTerms}
+VSCode,@vscode,https://marketplace.visualstudio.com/search?term={searchTerms}&target=VSCode
+Alternative,@alternative,https://alternativeto.net/browse/search/?q={searchTerms}
+GreasyFork,@fork,https://greasyfork.org/zh-CN/scripts?q={searchTerms}&page={startPage?}
+Julia,@julia,https://juliapackages.com/packages?search={searchTerms}
+Homebrew,@brew,https://formulae.brew.sh/formula/{searchTerms}
+crates,@crates,https://crates.io/search?q={searchTerms}
+Go,@go,https://pkg.go.dev/search?q={searchTerms}&ref=opensearch
+Arch,@arch,https://archlinux.org/packages/?q={searchTerms}
+ZLibrary,@zlib,https://z-library.sk/s/?q={searchTerms}
+Bangumi,@bgm,http://bgm.tv/subject_search/{searchTerms}?cat=all
+"Cambridge Dict",dictionary.cambridge.org,https://dictionary.cambridge.org/search/english/direct/?q={searchTerms}
+jsDelivr,jsdelivr.com,https://www.jsdelivr.com/?query={searchTerms}
+Gist,gist.github.com,https://gist.github.com/search?q={searchTerms}&ref=opensearch
+USW,userstyles.world,https://userstyles.world/search?q={searchTerms}
+explainshell.com,explainshell.com,https://explainshell.com/explain?cmd={searchTerms}
+eurogamer.net,eurogamer.net,https://www.eurogamer.net/search?q={searchTerms}
+isbnquery.org,isbnquery.org,https://isbnquery.org/search?searchType=all&query={searchTerms}
+npmx,npmx.dev,https://npmx.dev/search?q={searchTerms}
