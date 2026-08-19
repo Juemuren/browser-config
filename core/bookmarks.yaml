@@ -1,0 +1,267 @@
+bookmark_bar:
+  - name: Dev
+    children:
+      - name: Database
+        children:
+          - name: MongoDB
+            url: https://cloud.mongodb.com/
+      - name: Deploy
+        children:
+          - name: Analytics
+            url: https://analytics.google.com/
+          - name: Heroku
+            url: https://dashboard.heroku.com/
+          - name: Tongji
+            url: https://tongji.baidu.com/main/homepage/
+          - name: Vercel
+            url: https://vercel.com/
+      - name: Extension
+        children:
+          - name: Edge
+            url: https://microsoftedge.microsoft.com/addons/Microsoft-Edge-Extensions-Home
+          - name: GreasyFork
+            url: https://greasyfork.org/zh-CN
+          - name: VSCode
+            url: https://marketplace.visualstudio.com/
+          - name: Chrome
+            url: https://chromewebstore.google.com/category/extensions
+          - name: OpenVSX
+            url: https://open-vsx.org/
+      - name: Forum
+        children:
+          - name: StackOverflow
+            url: https://stackoverflow.com/
+      - name: Model
+        children:
+          - name: HuggingFace
+            url: https://huggingface.co/
+      - name: Package
+        children:
+          - name: Conda
+            url: https://anaconda.org/
+          - name: crates
+            url: https://crates.io/
+          - name: Go
+            url: https://pkg.go.dev/
+          - name: Homebrew
+            url: https://formulae.brew.sh/
+          - name: jsDelivr
+            url: https://www.jsdelivr.com/
+          - name: Julia
+            url: https://juliapackages.com/
+          - name: Mise
+            url: https://mise.jdx.dev/registry.html#tools
+          - name: MSYS2
+            url: https://packages.msys2.org/
+          - name: npm
+            url: https://www.npmjs.com/
+          - name: npmx
+            url: https://npmx.dev/
+          - name: PyPI
+            url: https://pypi.org/
+          - name: Scoop
+            url: https://scoop.sh/
+          - name: Vcpkg
+            url: https://vcpkg.io/en/packages
+      - name: Repo
+        children:
+          - name: GitHub
+            url: https://github.com/
+  - name: Fun
+    children:
+      - name: Domestic
+        children:
+          - name: Bililbili
+            url: https://www.bilibili.com/
+          - name: Tieba
+            url: https://tieba.baidu.com/
+          - name: Zhihu
+            url: https://www.zhihu.com/
+      - name: Foreign
+        children:
+          - name: Reddit
+            url: https://www.reddit.com/
+          - name: YouTube
+            url: https://www.youtube.com/
+      - name: Game
+        children:
+          - name: HLTV
+            url: https://www.hltv.org/
+          - name: itch
+            url: https://itch.io/
+          - name: Nexus
+            url: https://www.nexusmods.com/
+          - name: PRTS
+            url: https://prts.wiki/
+          - name: Steam
+            url: https://store.steampowered.com/
+  - name: Learn
+    children:
+      - name: Course
+        children:
+          - name: FullStackOpen
+            url: https://fullstackopen.com/zh/
+          - name: MissingSemester
+            url: https://missing-semester-cn.github.io/
+      - name: Lang
+        children:
+          - name: Bash
+            url: https://www.gnu.org/software/bash/manual/bash.html
+          - name: Cpp
+            url: https://en.cppreference.com/
+          - name: CSharp
+            url: https://learn.microsoft.com/en-us/dotnet/csharp/
+          - name: Go
+            url: https://go.dev/ref/spec
+          - name: Godot
+            url: https://docs.godotengine.org/
+          - name: jq
+            url: https://jqlang.org/manual/
+          - name: Julia
+            url: https://docs.julialang.org/
+          - name: Pwsh
+            url: https://learn.microsoft.com/en-us/powershell/
+          - name: Python
+            url: https://docs.python.org/
+          - name: Rust
+            url: https://doc.rust-lang.org/stable/book/
+          - name: TypeScript
+            url: https://www.typescriptlang.org/docs/
+          - name: Web
+            url: https://developer.mozilla.org/
+      - name: Library
+        children:
+          - name: acbjs
+            url: https://www.abcjs.net/
+          - name: Effect
+            url: https://www.effect.website/
+          - name: React
+            url: https://react.dev/learn
+          - name: Zustand
+            url: https://zustand.docs.pmnd.rs/
+      - name: Paper
+        children:
+          - name: GoogleScholar
+            url: https://scholar.google.com/
+          - name: SciHub
+            url: https://sci-hub.se/
+      - name: Tool
+        children:
+          - name: Codex
+            url: https://developers.openai.com/codex/config-reference
+          - name: Foam
+            url: https://docs.foam.md/
+          - name: Krita
+            url: https://docs.krita.org/
+          - name: Tauri
+            url: https://tauri.app/
+      - name: Tut
+        children:
+          - name: CSdiy
+            url: https://csdiy.wiki/
+          - name: SuperMemo
+            url: https://supermemo.guru/
+      - name: Wiki
+        children:
+          - name: CTF
+            url: https://ctf-wiki.org/
+          - name: OI
+            url: https://oi-wiki.org/
+          - name: Wiki
+            url: https://zh.wikipedia.org/
+  - name: Res
+    children:
+      - name: Book
+        children:
+          - name: Zlibrary
+            url: https://zlib.re/
+      - name: Icons
+        children:
+          - name: Lucide
+            url: https://lucide.dev/icons/
+          - name: NerdFonts
+            url: https://www.nerdfonts.com/cheat-sheet
+          - name: TechIcons
+            url: https://techicons.dev/
+      - name: Music
+        children:
+          - name: BasicPitch
+            url: https://basicpitch.spotify.com/
+          - name: MuseScore
+            url: https://musescore.com/
+          - name: Tan
+            url: https://www.tan8.com/
+      - name: Picture
+        children:
+          - name: Pixiv
+            url: https://www.pixiv.net/
+      - name: Rating
+        children:
+          - name: AlternativeTo
+            url: https://alternativeto.net/
+          - name: Bangumi
+            url: https://bangumi.tv/
+          - name: Douban
+            url: https://www.douban.com/
+          - name: Metacritic
+            url: https://www.metacritic.com/
+          - name: SteamDB
+            url: https://steamdb.info/
+      - name: Theme
+        children:
+          - name: Catppuccin
+            url: https://catppuccin.com/
+          - name: TokyoNight
+            url: https://tokyonight.org/
+      - name: Video
+        children:
+          - name: AllManga
+            url: https://allmanga.to/
+  - name: Tool
+    children:
+      - name: AI
+        children:
+          - name: ChatGPT
+            url: https://chatgpt.com/
+          - name: DeepSeek
+            url: https://chat.deepseek.com/
+          - name: Gemini
+            url: https://gemini.google.com/
+          - name: Grok
+            url: https://grok.com/
+      - name: Calc
+        children:
+          - name: Desmos
+            url: https://www.desmos.com/calculator
+          - name: Matrix
+            url: https://matrixcalc.org/zh-CN/
+      - name: Edit
+        children:
+          - name: LaTeX
+            url: https://latexlive.com/
+          - name: Regex
+            url: https://regex101.com/
+          - name: Defuddle
+            url: https://defuddle.md/
+      - name: Mail
+        children:
+          - name: Gmail
+            url: https://mail.google.com/
+          - name: QQmail
+            url: https://mail.qq.com/
+      - name: Trans
+        children:
+          - name: Bing
+            url: https://cn.bing.com/translator
+          - name: Cambridge
+            url: https://dictionary.cambridge.org/zhs/
+          - name: Google
+            url: https://translate.google.com/
+  - name: 笔记
+    url: https://juemuren.github.io/notes/
+  - name: 博客
+    url: https://juemuren.github.io/blog
+  - name: 钢琴
+    url: https://piano.raind.me/
+other: []
+synced: []
