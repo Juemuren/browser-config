@@ -1,0 +1,19 @@
+.Reward,
+.Question-sideColumn {
+    width: 0px;
+    display: none !important;
+}
+
+.Question-mainColumn {
+    width: 100%;
+}
+
+.HotSearchCard,
+.KfeCollection-CreateSaltCard {
+    display: none !important;
+}
+
+.Carousel-window img {
+    height: 0px !important;
+    display: none !important;
+}
