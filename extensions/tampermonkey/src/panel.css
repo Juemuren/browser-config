@@ -1,0 +1,123 @@
+:host {
+  all: initial;
+  color-scheme: light dark;
+  font:
+    14px / 1.5 system-ui,
+    sans-serif;
+}
+* {
+  box-sizing: border-box;
+}
+.launcher {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 2147483647;
+}
+.panel {
+  position: fixed;
+  right: 20px;
+  bottom: 72px;
+  z-index: 2147483647;
+  width: min(380px, calc(100vw - 24px));
+  max-height: min(70vh, 560px);
+  overflow: auto;
+  padding: 16px;
+  border: 1px solid #c5cbd3;
+  border-radius: 12px;
+  background: #fff;
+  color: #18212e;
+  box-shadow: 0 8px 30px #0004;
+}
+.heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.heading strong {
+  font-size: 16px;
+}
+button {
+  font: inherit;
+  cursor: pointer;
+  padding: 7px 11px;
+  border-radius: 7px;
+  border: 1px solid #a8b4c4;
+  background: #f5f7fa;
+  color: inherit;
+}
+button:hover {
+  background: #e8eef7;
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+button.primary {
+  border-color: #1465cf;
+  background: #1465cf;
+  color: white;
+}
+button.primary:hover {
+  background: #0c53b0;
+}
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 12px 0 0;
+}
+.list {
+  display: grid;
+  gap: 7px;
+  max-height: 300px;
+  overflow: auto;
+}
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 7px;
+  background: #f2f5f9;
+  overflow-wrap: anywhere;
+}
+.item input {
+  margin-top: 4px;
+}
+.muted {
+  color: #5e6978;
+  font-size: 12px;
+}
+.status {
+  margin: 10px 0 0;
+  overflow-wrap: anywhere;
+}
+.error {
+  color: #b42318;
+}
+@media (prefers-color-scheme: dark) {
+  .panel {
+    background: #1b2430;
+    color: #eff4fa;
+    border-color: #546274;
+  }
+  button {
+    background: #2b3848;
+    border-color: #607087;
+  }
+  button:hover {
+    background: #37485b;
+  }
+  .item {
+    background: #263342;
+  }
+  .muted {
+    color: #b2bfce;
+  }
+  .error {
+    color: #ff9e93;
+  }
+}
