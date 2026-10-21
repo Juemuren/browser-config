@@ -23,9 +23,7 @@ function requestValue<T>(request: IDBRequest<T>): Promise<T> {
   })
 }
 
-async function readDatabase(
-  name: string,
-): Promise<{
+async function readDatabase(name: string): Promise<{
   name: string
   version: number
   stores: Record<string, unknown[]>
