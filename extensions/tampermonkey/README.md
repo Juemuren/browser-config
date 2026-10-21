@@ -48,6 +48,6 @@ npm run typecheck
 ```sh
 npm run format
 npm run lint
-# lint + foramt
+# lint + format
 npm run check
 ```

@@ -1,6 +1,6 @@
 import vue from '@vitejs/plugin-vue'
 import { defineConfig } from 'vite'
-import monkey, { type MonkeyUserScript } from 'vite-plugin-monkey'
+import monkey, { cdn, type MonkeyUserScript } from 'vite-plugin-monkey'
 
 const scripts = {
   table: {
@@ -13,7 +13,7 @@ const scripts = {
       description: '选择页面中的一个或多个表格导出 CSV',
       match: ['*://*/*'],
       'run-at': 'document-idle',
-      grant: 'none',
+      grant: [],
     },
   },
   indexeddb: {
@@ -26,7 +26,7 @@ const scripts = {
       description: '扫描并选择页面数据库导出 JSON',
       match: ['*://*/*'],
       'run-at': 'document-idle',
-      grant: 'none',
+      grant: [],
     },
   },
   html: {
@@ -39,7 +39,7 @@ const scripts = {
       description: '点选页面元素，识别字体乱码并导出 HTML',
       match: ['*://*/*'],
       'run-at': 'document-idle',
-      grant: 'none',
+      grant: [],
     },
   },
 } satisfies Record<
@@ -56,7 +56,15 @@ export default defineConfig(({ mode }) => {
       monkey({
         entry: script.entry,
         userscript: script.userscript,
-        build: { fileName: script.file },
+        build: {
+          fileName: script.file,
+          externalGlobals: {
+            vue: cdn.jsdelivr('Vue', 'dist/vue.runtime.global.prod.js'),
+            jszip: cdn.jsdelivr('JSZip', 'dist/jszip.min.js'),
+            html2canvas: cdn.jsdelivr('html2canvas', 'dist/html2canvas.min.js'),
+            'tesseract.js': cdn.jsdelivr('Tesseract', 'dist/tesseract.min.js'),
+          },
+        },
       }),
     ],
     build: { outDir: 'dist', emptyOutDir: false },
