@@ -1,0 +1,30 @@
+body {
+  max-width: 1000px;
+  margin: 36px auto;
+  padding: 24px;
+  font:
+    16px / 1.7 system-ui,
+    sans-serif;
+  overflow-wrap: anywhere;
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+.notice {
+  padding: 10px;
+  background: #fff3cd;
+}
+
+html body .source-link a {
+  color: #0969da;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+html body .source-link a:hover {
+  color: #0550ae;
+}

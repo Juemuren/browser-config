@@ -35,7 +35,7 @@ const scripts = {
     userscript: {
       name: '导出页面元素 HTML（OCR）',
       namespace: 'https://github.com/Juemuren/browser-config',
-      version: '2.0.2',
+      version: '2.0.4',
       description: '点选页面元素，识别字体乱码并导出 HTML',
       match: ['*://*/*'],
       'run-at': 'document-idle',

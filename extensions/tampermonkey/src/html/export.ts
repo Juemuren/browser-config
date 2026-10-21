@@ -1,6 +1,7 @@
 import html2canvas from 'html2canvas'
 import { createWorker, type Worker } from 'tesseract.js'
 import { download, safeFilename } from '../shared'
+import exportStyles from './export.css?inline'
 
 const garbled = /[\uE000-\uF8FF]/u
 let workerPromise: Promise<Worker> | undefined
@@ -46,6 +47,14 @@ function ocrTargets(nodes: Text[], forceOcr: boolean): TextTarget[] {
       !value.trim()
     )
       continue
+    const range = document.createRange()
+    range.selectNodeContents(node)
+    if (
+      !Array.from(range.getClientRects()).some(
+        (rect) => rect.width > 0 && rect.height > 0,
+      )
+    )
+      continue
     if (forceOcr) {
       targets.push({ node, start: 0, end: value.length })
     } else if (garbled.test(value)) {
@@ -53,6 +62,17 @@ function ocrTargets(nodes: Text[], forceOcr: boolean): TextTarget[] {
     }
   }
   return targets
+}
+
+function captureElement(node: Text): HTMLElement {
+  let element = node.parentElement
+  while (element instanceof HTMLElement) {
+    // display: contents has visible text but no box to capture.
+    const rect = element.getBoundingClientRect()
+    if (rect.width > 0 && rect.height > 0) return element
+    element = element.parentElement
+  }
+  throw new Error('找不到可截图的文本容器')
 }
 
 function captureTarget(
@@ -127,6 +147,68 @@ function normalizedText(
   return `${original.match(/^\s*/)?.[0] || ''}${content}${original.match(/\s*$/)?.[0] || ''}`
 }
 
+function preserveReadableText(original: string, recognized: string): string {
+  // OCR aligns against the full line, but only private-use glyphs are replaced.
+  const source = Array.from(original)
+  const result = Array.from(recognized.replace(/\s+/gu, ''))
+  const width = result.length + 1
+  if ((source.length + 1) * width > 4_000_000)
+    throw new Error('文本过长，无法安全对齐 OCR 结果')
+  const scores = new Int32Array((source.length + 1) * width)
+  const moves = new Uint8Array(scores.length)
+  for (let row = 1; row <= source.length; row++) {
+    scores[row * width] = scores[(row - 1) * width] - 2
+    moves[row * width] = 1
+  }
+  for (let column = 1; column <= result.length; column++) {
+    scores[column] = scores[column - 1] - 2
+    moves[column] = 2
+  }
+  for (let row = 1; row <= source.length; row++) {
+    for (let column = 1; column <= result.length; column++) {
+      const index = row * width + column
+      const character = source[row - 1]
+      const diagonal =
+        scores[index - width - 1] +
+        (garbled.test(character)
+          ? 1
+          : character === result[column - 1]
+            ? 6
+            : -6)
+      const removeSource = scores[index - width] - 2
+      const removeResult = scores[index - 1] - 2
+      if (diagonal >= removeSource && diagonal >= removeResult) {
+        scores[index] = diagonal
+      } else if (removeSource >= removeResult) {
+        scores[index] = removeSource
+        moves[index] = 1
+      } else {
+        scores[index] = removeResult
+        moves[index] = 2
+      }
+    }
+  }
+  const output: string[] = []
+  let row = source.length
+  let column = result.length
+  while (row > 0 || column > 0) {
+    const move = moves[row * width + column]
+    if (row > 0 && column > 0 && move === 0) {
+      output.push(
+        garbled.test(source[row - 1]) ? result[column - 1] : source[row - 1],
+      )
+      row--
+      column--
+    } else if (row > 0 && (column === 0 || move === 1)) {
+      output.push(source[row - 1])
+      row--
+    } else {
+      column--
+    }
+  }
+  return output.reverse().join('')
+}
+
 function absoluteUrl(value: string): string {
   try {
     return new URL(value, location.href).href
@@ -173,18 +255,58 @@ function cleanClone(root: Element): void {
   }
 }
 
-function escapeHtml(value: string): string {
-  const entities: Record<string, string> = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;',
-  }
-  return value.replace(
-    /[&<>"']/g,
-    (character) => entities[character] ?? character,
+function buildExportHtml(
+  root: Element,
+  recognized: number,
+  failed: number,
+  hasOcr: boolean,
+): string {
+  const exported = document.implementation.createHTMLDocument(
+    document.title || '页面元素',
   )
+  exported.documentElement.lang = 'zh-CN'
+
+  const charset = exported.createElement('meta')
+  charset.setAttribute('charset', 'utf-8')
+  const viewport = exported.createElement('meta')
+  viewport.name = 'viewport'
+  viewport.content = 'width=device-width,initial-scale=1'
+  const base = exported.createElement('base')
+  base.href = location.href
+  exported.head.prepend(charset, viewport, base)
+
+  for (const node of document.querySelectorAll(
+    'style, link[rel~="stylesheet"]',
+  )) {
+    const copy = exported.importNode(node, true)
+    if (copy instanceof HTMLLinkElement)
+      copy.href = absoluteUrl(copy.getAttribute('href') || '')
+    exported.head.append(copy)
+  }
+  const style = exported.createElement('style')
+  style.textContent = exportStyles
+  exported.head.append(style)
+
+  const source = exported.createElement('p')
+  source.className = 'source-link'
+  source.append('原始页面：')
+  const link = exported.createElement('a')
+  link.href = location.href
+  link.textContent = location.href
+  source.append(link)
+  exported.body.append(source)
+
+  if (hasOcr) {
+    const notice = exported.createElement('p')
+    notice.className = 'notice'
+    notice.textContent = `OCR 已识别 ${recognized} 处，失败 ${failed} 处。识别文本可能有误，请核对原网页。`
+    exported.body.append(notice)
+  }
+  exported.body.append(
+    exported.createElement('hr'),
+    exported.importNode(root, true),
+  )
+  return `<!DOCTYPE html>\n${exported.documentElement.outerHTML}`
 }
 
 export async function exportElement(
@@ -210,17 +332,18 @@ export async function exportElement(
       const parent = target.node.parentElement
       if (!(parent instanceof HTMLElement))
         throw new Error('不支持识别非 HTML 文本节点')
-      let captured = canvasCache.get(parent)
+      const container = captureElement(target.node)
+      let captured = canvasCache.get(container)
       if (!captured) {
-        captured = html2canvas(parent, {
+        captured = html2canvas(container, {
           scale: 2,
           backgroundColor: '#fff',
           useCORS: true,
           logging: false,
         })
-        canvasCache.set(parent, captured)
+        canvasCache.set(container, captured)
       }
-      const canvas = captureTarget(target, await captured, parent)
+      const canvas = captureTarget(target, await captured, container)
       const result = await (await getWorker()).recognize(canvas)
       const text = result.data.text.trim()
       if (!text) throw new Error('OCR 结果为空')
@@ -232,7 +355,9 @@ export async function exportElement(
       edits.push({
         start: target.start,
         end: target.end,
-        text: normalizedText(text, original, parent),
+        text: forceOcr
+          ? normalizedText(text, original, parent)
+          : preserveReadableText(original, text),
       })
       replacements.set(target.node, edits)
       recognized++
@@ -255,20 +380,7 @@ export async function exportElement(
     document.title || element.tagName.toLowerCase(),
     'element',
   )
-  const notice = targets.length
-    ? `<p class="notice">OCR 已识别 ${recognized} 处，失败 ${failed} 处。识别文本可能有误，请核对原网页。</p>`
-    : ''
-  const pageStyles = Array.from(
-    document.querySelectorAll('style, link[rel~="stylesheet"]'),
-  )
-    .map((node) => {
-      const copy = node.cloneNode(true) as Element
-      if (copy instanceof HTMLLinkElement)
-        copy.href = absoluteUrl(copy.getAttribute('href') || '')
-      return copy.outerHTML
-    })
-    .join('\n')
-  const html = `<!DOCTYPE html>\n<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="${escapeHtml(location.href)}"><title>${escapeHtml(document.title || '页面元素')}</title>${pageStyles}<style>body{max-width:1000px;margin:36px auto;padding:24px;font:16px/1.7 system-ui,sans-serif;overflow-wrap:anywhere}img,video{max-width:100%;height:auto}.notice{padding:10px;background:#fff3cd}</style></head><body><p>原始页面：<a href="${escapeHtml(location.href)}">${escapeHtml(location.href)}</a></p>${notice}<hr>${clone.outerHTML}</body></html>`
+  const html = buildExportHtml(clone, recognized, failed, targets.length > 0)
   download(
     new Blob([html], { type: 'text/html;charset=utf-8' }),
     `${title}.html`,
