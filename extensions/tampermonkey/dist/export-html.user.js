@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         导出页面元素 HTML（OCR）
 // @namespace    https://github.com/Juemuren/browser-config
-// @version      2.0.0
+// @version      2.0.2
 // @description  点选页面元素，识别字体乱码并导出 HTML
 // @match        *://*/*
 // @require      https://cdn.jsdelivr.net/npm/vue@3.5.44/dist/vue.runtime.global.prod.js
@@ -68,21 +68,85 @@
     workerPromise = void 0;
     if (pending) await (await pending).terminate();
   }
-  function ocrTargets(root) {
+  function textNodes(root) {
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-    const targets = new Set();
+    const nodes = [];
     while (walker.nextNode()) {
       const node = walker.currentNode;
-      if (!garbled.test(node.textContent || "")) continue;
-      const parent = node.parentElement;
-      if (parent && !parent.closest("script, style, noscript"))
-        targets.add(parent);
+      nodes.push(node);
     }
-    return Array.from(targets).filter(
-      (target) => !Array.from(targets).some(
-        (other) => other !== target && other.contains(target)
-      )
+    return nodes;
+  }
+  function ocrTargets(nodes, forceOcr) {
+    const targets = [];
+    for (const node of nodes) {
+      const parent = node.parentElement;
+      const value = node.nodeValue || "";
+      if (!parent || parent.closest("script, style, noscript, textarea") || !value.trim())
+        continue;
+      if (forceOcr) {
+        targets.push({ node, start: 0, end: value.length });
+      } else if (garbled.test(value)) {
+        targets.push({ node, start: 0, end: value.length });
+      }
+    }
+    return targets;
+  }
+  function captureTarget(target, source, parent) {
+    const range = document.createRange();
+    range.setStart(target.node, target.start);
+    range.setEnd(target.node, target.end);
+    const rects = Array.from(range.getClientRects()).filter(
+      (rect) => rect.width > 0 && rect.height > 0
     );
+    const parentRect = parent.getBoundingClientRect();
+    if (!rects.length || !parentRect.width || !parentRect.height)
+      throw new Error("文本区域不可见");
+    const scaleX = source.width / parentRect.width;
+    const scaleY = source.height / parentRect.height;
+    const slices = rects.map((rect) => {
+      const x = Math.max(0, Math.floor((rect.left - parentRect.left) * scaleX));
+      const y = Math.max(0, Math.floor((rect.top - parentRect.top) * scaleY));
+      return {
+        x,
+        y,
+        width: Math.min(source.width - x, Math.ceil(rect.width * scaleX)),
+        height: Math.min(source.height - y, Math.ceil(rect.height * scaleY))
+      };
+    }).filter((slice) => slice.width > 0 && slice.height > 0);
+    if (!slices.length) throw new Error("文本截图尺寸无效");
+    const padding = 8;
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(...slices.map((slice) => slice.width)) + padding * 2;
+    canvas.height = slices.reduce(
+      (total, slice) => total + slice.height + padding,
+      padding
+    );
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("无法创建文本截图");
+    context.fillStyle = "#fff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    let top = padding;
+    for (const slice of slices) {
+      context.drawImage(
+        source,
+        slice.x,
+        slice.y,
+        slice.width,
+        slice.height,
+        padding,
+        top,
+        slice.width,
+        slice.height
+      );
+      top += slice.height + padding;
+    }
+    return canvas;
+  }
+  function normalizedText(text, original, parent) {
+    const whiteSpace = getComputedStyle(parent).whiteSpace;
+    const content = whiteSpace.startsWith("pre") ? text.trim() : text.replace(/\s+/g, " ").trim();
+    return `${original.match(/^\s*/)?.[0] || ""}${content}${original.match(/\s*$/)?.[0] || ""}`;
   }
   function absoluteUrl(value) {
     try {
@@ -136,32 +200,58 @@
   }
   async function exportElement(element, update, forceOcr = false) {
     await document.fonts.ready;
-    const targets = forceOcr ? [element] : ocrTargets(element);
-    const originals = [element, ...Array.from(element.querySelectorAll("*"))];
+    const originals = textNodes(element);
+    const targets = ocrTargets(originals, forceOcr);
     const clone = element.cloneNode(true);
-    const copies = [clone, ...Array.from(clone.querySelectorAll("*"))];
+    const copies = textNodes(clone);
+    const canvasCache = new Map();
+    const replacements = new Map();
     let recognized = 0;
     let failed = 0;
     for (const [index, target] of targets.entries()) {
       update(`OCR 识别 ${index + 1}/${targets.length}…`);
       try {
-        const canvas = await html2canvas(target, {
-          scale: 2,
-          backgroundColor: "#fff",
-          useCORS: true,
-          logging: false
-        });
-        if (!canvas.width || !canvas.height) throw new Error("截图尺寸无效");
+        const parent = target.node.parentElement;
+        if (!(parent instanceof HTMLElement))
+          throw new Error("不支持识别非 HTML 文本节点");
+        let captured = canvasCache.get(parent);
+        if (!captured) {
+          captured = html2canvas(parent, {
+            scale: 2,
+            backgroundColor: "#fff",
+            useCORS: true,
+            logging: false
+          });
+          canvasCache.set(parent, captured);
+        }
+        const canvas = captureTarget(target, await captured, parent);
         const result = await (await getWorker()).recognize(canvas);
         const text = result.data.text.trim();
         if (!text) throw new Error("OCR 结果为空");
-        const copy = copies[originals.indexOf(target)];
-        copy?.replaceChildren(document.createTextNode(text));
+        const copy = copies[originals.indexOf(target.node)];
+        if (!copy) throw new Error("找不到导出副本中的文本节点");
+        const original = target.node.nodeValue?.slice(target.start, target.end) || "";
+        const edits = replacements.get(target.node) || [];
+        edits.push({
+          start: target.start,
+          end: target.end,
+          text: normalizedText(text, original, parent)
+        });
+        replacements.set(target.node, edits);
         recognized++;
       } catch (error) {
         console.warn("[HTML 导出] OCR 失败，保留原文", error);
         failed++;
       }
+    }
+    for (const [node, edits] of replacements) {
+      const copy = copies[originals.indexOf(node)];
+      if (!copy) continue;
+      let value = node.nodeValue || "";
+      for (const edit of edits.sort((left, right) => right.start - left.start)) {
+        value = value.slice(0, edit.start) + edit.text + value.slice(edit.end);
+      }
+      copy.nodeValue = value;
     }
     cleanClone(clone);
     const title = safeFilename(
@@ -298,7 +388,7 @@
                 })
               }, "关闭")
             ]),
-            _cache[5] || (_cache[5] = vue.createElementVNode("p", { class: "muted" }, " 选择元素后，仅对其中含私用区字符的文字区域执行 OCR。首次识别需要下载中文和英文模型。 ", -1)),
+            _cache[5] || (_cache[5] = vue.createElementVNode("p", { class: "muted" }, " 脚本会自动对含私用区字符的文本节点执行 OCR。 首次识别需要下载中文和英文模型。 ", -1)),
             vue.createElementVNode("label", _hoisted_3, [
               vue.withDirectives(vue.createElementVNode("input", {
                 "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => forceOcr.value = $event),
@@ -306,7 +396,7 @@
               }, null, 512), [
                 [vue.vModelCheckbox, forceOcr.value]
               ]),
-              _cache[4] || (_cache[4] = vue.createTextVNode("整个元素执行 OCR（用于未使用私用区字符的字体乱码，会将内部排版替换为纯文字）", -1))
+              _cache[4] || (_cache[4] = vue.createTextVNode(" 强制识别所有文本 ", -1))
             ]),
             vue.createElementVNode("div", _hoisted_4, [
               vue.createElementVNode("button", {

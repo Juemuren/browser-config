@@ -90,21 +90,22 @@ onUnmounted(() => {
   </button>
   <section v-if="open" class="panel" aria-label="HTML 导出">
     <div class="heading">
-      <strong>导出页面元素</strong
-      ><button type="button" @click="open = false; stopPicking()">关闭</button>
+      <strong>导出页面元素</strong>
+      <button type="button" @click="open = false; stopPicking()">关闭</button>
     </div>
     <p class="muted">
-      选择元素后，仅对其中含私用区字符的文字区域执行
-      OCR。首次识别需要下载中文和英文模型。
+      脚本会自动对含私用区字符的文本节点执行 OCR。
+      首次识别需要下载中文和英文模型。
     </p>
-    <label class="item"
-      ><input v-model="forceOcr" type="checkbox">整个元素执行
-      OCR（用于未使用私用区字符的字体乱码，会将内部排版替换为纯文字）</label
-    >
+    <label class="item">
+      <input v-model="forceOcr" type="checkbox">
+      强制识别所有文本
+    </label>
     <div class="actions">
       <button type="button" :disabled="busy" @click="startPicking">
         {{ picking ? '正在选择…' : '选择元素' }}
-      </button><button
+      </button>
+      <button
         class="primary"
         type="button"
         :disabled="busy || !selected"

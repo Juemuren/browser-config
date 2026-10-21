@@ -49,21 +49,21 @@ async function save() {
   </button>
   <section v-if="open" class="panel" aria-label="IndexedDB 导出">
     <div class="heading">
-      <strong>选择数据库</strong
-      ><button type="button" @click="open = false">关闭</button>
+      <strong>选择数据库</strong>
+      <button type="button" @click="open = false">关闭</button>
     </div>
     <div class="list">
       <label v-for="choice in choices" :key="choice.name" class="item">
         <input v-model="selected" type="checkbox" :value="choice.name">
-        <span
-          >{{ choice.name }}
-          <span class="muted">（版本 {{ choice.version }}）</span></span
-        >
+        <span>
+          {{ choice.name }}
+          <span class="muted">（版本 {{ choice.version }}）</span>
+        </span>
       </label>
     </div>
     <div class="actions">
-      <button type="button" :disabled="busy" @click="scan">重新扫描</button
-      ><button
+      <button type="button" :disabled="busy" @click="scan">重新扫描</button>
+      <button
         class="primary"
         type="button"
         :disabled="busy || !selected.length"

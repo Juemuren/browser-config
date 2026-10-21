@@ -41,24 +41,23 @@ async function save() {
   </button>
   <section v-if="open" class="panel" aria-label="表格导出">
     <div class="heading">
-      <strong>选择表格</strong
-      ><button type="button" @click="open = false">关闭</button>
+      <strong>选择表格</strong>
+      <button type="button" @click="open = false">关闭</button>
     </div>
     <div class="list">
       <label v-for="(choice, index) in choices" :key="index" class="item">
         <input v-model="selected" type="checkbox" :value="choice.element">
-        <span
-          >{{ choice.label }}
-          <span class="muted"
-            >（{{ choice.rows }}
-            行 × {{ choice.columns }} 列）</span
-          ></span
-        >
+        <span>
+          {{ choice.label }}
+          <span class="muted">
+            （{{ choice.rows }}行 x {{ choice.columns }} 列）
+          </span>
+        </span>
       </label>
     </div>
     <div class="actions">
-      <button type="button" @click="scan">重新扫描</button
-      ><button
+      <button type="button" @click="scan">重新扫描</button>
+      <button
         class="primary"
         type="button"
         :disabled="busy || !selected.length"
