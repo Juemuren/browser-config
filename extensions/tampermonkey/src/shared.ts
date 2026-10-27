@@ -2,7 +2,7 @@ import type { Component } from 'vue'
 import { createApp } from 'vue'
 import styles from './panel.css?inline'
 
-export function mountPanel(component: Component): void {
+export function mountPanel(component: Component): HTMLElement | undefined {
   if (window.top !== window.self) return
   const host = document.createElement('div')
   host.dataset.browserExportPanel = ''
@@ -22,6 +22,7 @@ export function mountPanel(component: Component): void {
     },
     { once: true },
   )
+  return host
 }
 
 export function safeFilename(value: string, fallback: string): string {

@@ -39,6 +39,10 @@
 .heading strong {
   font-size: 16px;
 }
+h2 {
+  margin: 0 0 12px;
+  font-size: 15px;
+}
 button {
   font: inherit;
   cursor: pointer;
@@ -62,6 +66,22 @@ button.primary {
 }
 button.primary:hover {
   background: #0c53b0;
+}
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #c5cbd3;
+}
+.tabs button {
+  flex: 1;
+  padding: 6px 4px;
+  font-size: 12px;
+}
+.tabs button[aria-pressed="true"] {
+  border-color: #1465cf;
+  color: #1465cf;
 }
 .actions {
   display: flex;
@@ -103,6 +123,12 @@ button.primary:hover {
     background: #1b2430;
     color: #eff4fa;
     border-color: #546274;
+  }
+  .tabs {
+    border-color: #546274;
+  }
+  .tabs button[aria-pressed="true"] {
+    color: #8abaff;
   }
   button {
     background: #2b3848;

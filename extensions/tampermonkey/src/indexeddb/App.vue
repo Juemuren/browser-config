@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { errorMessage } from '../shared'
 import { type DatabaseChoice, exportDatabases, scanDatabases } from './export'
 
-const open = ref(false)
+const props = defineProps<{ active: boolean }>()
 const busy = ref(false)
 const choices = ref<DatabaseChoice[]>([])
 const selected = ref<string[]>([])
@@ -24,10 +24,17 @@ async function scan() {
     busy.value = false
   }
 }
-function toggle() {
-  open.value = !open.value
-  if (open.value) void scan()
-}
+let initialized = false
+watch(
+  () => props.active,
+  (active) => {
+    if (active && !initialized) {
+      initialized = true
+      void scan()
+    }
+  },
+  { immediate: true },
+)
 async function save() {
   busy.value = true
   try {
@@ -44,14 +51,8 @@ async function save() {
 </script>
 
 <template>
-  <button class="launcher primary" type="button" @click="toggle">
-    导出 IndexedDB
-  </button>
-  <section v-if="open" class="panel" aria-label="IndexedDB 导出">
-    <div class="heading">
-      <strong>选择数据库</strong>
-      <button type="button" @click="open = false">关闭</button>
-    </div>
+  <div>
+    <h2>选择数据库</h2>
     <div class="list">
       <label v-for="choice in choices" :key="choice.name" class="item">
         <input v-model="selected" type="checkbox" :value="choice.name">
@@ -73,5 +74,5 @@ async function save() {
       </button>
     </div>
     <p class="status" role="status">{{ status }}</p>
-  </section>
+  </div>
 </template>

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { onUnmounted, ref } from 'vue'
+import { onUnmounted, ref, watch } from 'vue'
 import { errorMessage } from '../shared'
 import { exportElement, stopWorker } from './export'
 
-const open = ref(false)
+const props = defineProps<{ active: boolean }>()
 const picking = ref(false)
 const busy = ref(false)
 const forceOcr = ref(false)
@@ -51,6 +51,12 @@ function stopPicking() {
   document.removeEventListener('keydown', keydown, true)
   clearHighlight()
 }
+watch(
+  () => props.active,
+  (active) => {
+    if (!active) stopPicking()
+  },
+)
 function startPicking() {
   if (picking.value) return
   picking.value = true
@@ -85,14 +91,8 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <button class="launcher primary" type="button" @click="open = !open">
-    导出元素 HTML
-  </button>
-  <section v-if="open" class="panel" aria-label="HTML 导出">
-    <div class="heading">
-      <strong>导出页面元素</strong>
-      <button type="button" @click="open = false; stopPicking()">关闭</button>
-    </div>
+  <div>
+    <h2>导出页面元素</h2>
     <p class="muted">
       脚本会自动对含私用区字符的文本节点执行 OCR。
       首次识别需要下载中文和英文模型。
@@ -115,5 +115,5 @@ onUnmounted(() => {
       </button>
     </div>
     <p class="status" role="status">{{ status }}</p>
-  </section>
+  </div>
 </template>

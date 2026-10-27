@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { errorMessage } from '../shared'
 import { exportTables, scanTables, type TableChoice } from './export'
 
-const open = ref(false)
+const props = defineProps<{ active: boolean }>()
 const busy = ref(false)
 const choices = ref<TableChoice[]>([])
 const selected = ref<HTMLTableElement[]>([])
@@ -16,10 +16,17 @@ function scan() {
     ? `找到 ${choices.value.length} 个表格`
     : '当前页面没有找到表格'
 }
-function toggle() {
-  open.value = !open.value
-  if (open.value) scan()
-}
+let initialized = false
+watch(
+  () => props.active,
+  (active) => {
+    if (active && !initialized) {
+      initialized = true
+      scan()
+    }
+  },
+  { immediate: true },
+)
 async function save() {
   busy.value = true
   try {
@@ -36,14 +43,8 @@ async function save() {
 </script>
 
 <template>
-  <button class="launcher primary" type="button" @click="toggle">
-    导出表格 CSV
-  </button>
-  <section v-if="open" class="panel" aria-label="表格导出">
-    <div class="heading">
-      <strong>选择表格</strong>
-      <button type="button" @click="open = false">关闭</button>
-    </div>
+  <div>
+    <h2>选择表格</h2>
     <div class="list">
       <label v-for="(choice, index) in choices" :key="index" class="item">
         <input v-model="selected" type="checkbox" :value="choice.element">
@@ -67,5 +68,5 @@ async function save() {
       </button>
     </div>
     <p class="status" role="status">{{ status }}</p>
-  </section>
+  </div>
 </template>
